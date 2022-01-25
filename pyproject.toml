@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "glyphdata_manager"
+version = "0.1.0"
+description = ""
+authors = ["Nikolaus Waxweiler <nikolaus.waxweiler@daltonmaag.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+ufoLib2 = "^0.13"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+isort = "*"
+mypy = "*"
+pylint = "*"
+pytest = "*"
+pytest-cov = "*"
+
+# https://black.readthedocs.io/en/stable/pyproject_toml.html#pyproject-toml
+[tool.black]
+target-version = ["py38"]
+
+# https://black.readthedocs.io/en/stable/compatible_configs.html#isort
+[tool.isort]
+profile = "black"
+
+# https://code.visualstudio.com/docs/python/linting#_default-pylint-rules
+[tool.pylint.messages_control]
+disable = "all"
+enable = "F, E, unreachable, duplicate-key, unnecessary-semicolon, global-variable-not-assigned, unused-variable, binary-op-exception, bad-format-string, anomalous-backslash-in-string, bad-open-mode, unused-import"
+
+[tool.pylint.format]
+max-line-length = "88"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

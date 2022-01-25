@@ -1,0 +1,51 @@
+image: registry.daltonmaag.com/damadevs/python-java-docker-image:latest
+
+variables:
+  XDG_CACHE_HOME: "$CI_PROJECT_DIR/.cache"  # For pip and pre-commit.
+  PIP_EXTRA_INDEX_URL: https://pypi.daltonmaag.com/simple
+
+cache:
+  paths:
+    - "$XDG_CACHE_HOME"
+  key: "$CI_PROJECT_ID"
+
+stages:
+  - test
+  - deploy
+
+lint:
+  stage: test
+  script:
+    - pip3 install -q tox poetry
+    - tox -e lint
+  cache:
+    paths:
+      - "$XDG_CACHE_HOME"
+      - "$CI_PROJECT_DIR/.tox/lint"  # To speed up lint runs.
+    key: "$CI_PROJECT_ID"
+
+test:
+  stage: test
+  script:
+    - pip3 install -q tox poetry
+    - tox -e py38
+
+build:
+  stage: test
+  script:
+    - pip3 install -q poetry
+    - poetry build -f wheel
+  artifacts:
+    name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}"
+    expire_in: "1d"
+    paths:
+      - dist/*.whl
+
+deploy:
+  stage: deploy
+  script:
+    - scp dist/*.whl pypi@pypi.daltonmaag.com:/var/pypi/repo
+  only:
+    # Only deploy to PyPI on tags that match a PEP 440 compliant version string
+    # (with optionally prepended "v"). https://www.python.org/dev/peps/pep-0440/#appendix-b-parsing-version-strings-with-regular-expressions
+    - /^v?([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
