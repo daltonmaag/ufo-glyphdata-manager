@@ -11,3 +11,4 @@ Store your family-wide glyph data in a central CSV file instead of duplicated in
 - Add arguments on which pieces of data (columns) to write?
 - Custom fields for custom purposes, like subsets?
 - Interaction between encoding and CSV file?
+- Also store kerning group information?
