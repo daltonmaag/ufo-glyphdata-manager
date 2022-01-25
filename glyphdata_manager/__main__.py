@@ -27,9 +27,14 @@ def extract_from_ufos(ufos: list[Font]) -> dict[str, GlyphData]:
         otc: dict[str, str] = ufo.lib.get("public.openTypeCategories", {})
         seg: list[str] = ufo.lib.get("public.skipExportGlyphs", [])
 
-        for glyph in ufo:
-            glyph_name = glyph.name
-            assert glyph_name is not None
+        # Visit in glyph order, append unlisted glyphs sorted.
+        glyph_order = ufo.glyphOrder
+        glyph_order_leftovers = sorted(set(ufo.keys()) - set(glyph_order))
+
+        for glyph_name in glyph_order + glyph_order_leftovers:
+            glyph = ufo.get(glyph_name)
+            if glyph is None:
+                continue  # Listed glyphs may not exist.
             data = GlyphData(
                 export=glyph.name not in seg,
                 opentype_category=otc.get(glyph_name),
