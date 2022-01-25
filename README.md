@@ -10,3 +10,5 @@ Store your family-wide glyph data in a central CSV file instead of duplicated in
 - Write CSV data into UFOs
 - Add arguments on which pieces of data (columns) to write?
 - Order glyphs by glyphOrder
+- Custom fields for custom purposes, like subsets?
+- Interaction between encoding and CSV file?
