@@ -11,6 +11,14 @@ from pathlib import Path
 
 from ufoLib2 import Font
 
+HEADER: tuple[str, ...] = (
+    "name",
+    "postscript_name",
+    "unicodes",
+    "opentype_category",
+    "export",
+)
+
 
 @dataclass
 class GlyphData:
@@ -56,13 +64,62 @@ def extract_from_ufos(ufos: list[Font]) -> dict[str, GlyphData]:
     return glyph_data
 
 
+def apply_to_ufos(ufos: list[Font], glyph_data: dict[str, GlyphData]) -> None:
+    # Always overwrite data until we support glyph lists.
+    psn: dict[str, str] = {}
+    otc: dict[str, str] = {}
+    seg: list[str] = []
+    for glyph_name, data in glyph_data.items():
+        if data.postscript_name is not None:
+            psn[glyph_name] = data.postscript_name
+        if data.opentype_category is not None:
+            otc[glyph_name] = data.opentype_category
+        if not data.export:
+            seg.append(glyph_name)
+    seg = sorted(seg)
+
+    for ufo in ufos:
+        ufo.lib["public.postscriptNames"] = psn
+        ufo.lib["public.openTypeCategories"] = otc
+        ufo.lib["public.skipExportGlyphs"] = seg
+
+        # Delete empty dicts and lists.
+        if not ufo.lib["public.postscriptNames"]:
+            del ufo.lib["public.postscriptNames"]
+        if not ufo.lib["public.openTypeCategories"]:
+            del ufo.lib["public.openTypeCategories"]
+        if not ufo.lib["public.skipExportGlyphs"]:
+            del ufo.lib["public.skipExportGlyphs"]
+
+        ufo.save()
+
+
+def read_csv(path: Path) -> dict[str, GlyphData]:
+    glyph_data: dict[str, GlyphData] = {}
+    with open(path) as csvfile:
+        reader = csv.reader(csvfile)
+        header = next(reader)
+        if tuple(header) != HEADER:
+            raise Exception("Header in CSV file does not match internally known header")
+        for row in reader:
+            if not row:
+                continue
+            name, postscript_name, unicodes, opentype_category, export = row
+            glyph_data[name] = GlyphData(
+                export=True if export.lower() == "true" else False,
+                opentype_category=opentype_category or None,
+                postscript_name=postscript_name or None,
+                unicodes=[int(v, 16) for v in unicodes.split(" ")] if unicodes else [],
+            )
+    return glyph_data
+
+
 def write_csv(path: Path, glyph_data: dict[str, GlyphData]) -> None:
-    header = ("name", "postscript_name", "unicodes", "opentype_category", "export")
     with open(path, "w+") as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(header)
+        writer = csv.writer(csvfile)
+        writer.writerow(HEADER)
         for glyph, data in glyph_data.items():
-            csvwriter.writerow(
+            writer.writerow(
                 (
                     glyph,
                     data.postscript_name or "",
@@ -78,6 +135,11 @@ def extract_data(args: argparse.Namespace) -> None:
     write_csv(args.output, glyph_data)
 
 
+def apply_data(args: argparse.Namespace) -> None:
+    glyph_data = read_csv(args.csv)
+    apply_to_ufos(args.ufos, glyph_data)
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -91,10 +153,10 @@ if __name__ == "__main__":
     # parser_extract.add_argument("--glyph-list", type=Path)
     parser_extract.set_defaults(func=extract_data)
 
-    # parser_apply = subparsers.add_parser("apply")
-    # parser_apply.add_argument("csv", type=Path)
-    # parser_apply.add_argument("ufos", nargs="+", type=Font.open)
-    # parser_extract.set_defaults(func=None)
+    parser_apply = subparsers.add_parser("apply")
+    parser_apply.add_argument("csv", type=Path)
+    parser_apply.add_argument("ufos", nargs="+", type=Font.open)
+    parser_apply.set_defaults(func=apply_data)
 
     parsed_args = parser.parse_args()
     parsed_args.func(parsed_args)
