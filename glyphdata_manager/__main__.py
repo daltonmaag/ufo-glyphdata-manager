@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import csv
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,20 +115,27 @@ def read_csv(path: Path) -> dict[str, GlyphData]:
     return glyph_data
 
 
-def write_csv(path: Path, glyph_data: dict[str, GlyphData]) -> None:
-    with open(path, "w+") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(HEADER)
-        for glyph, data in glyph_data.items():
-            writer.writerow(
-                (
-                    glyph,
-                    data.postscript_name or "",
-                    " ".join(f"{v:04X}" for v in data.unicodes),
-                    data.opentype_category or "",
-                    data.export,
-                )
+def write_csv(path: Path | None, glyph_data: dict[str, GlyphData]) -> None:
+    if path is not None:
+        output_stream = open(path, "w+")
+    else:
+        output_stream = sys.stdout
+
+    writer = csv.writer(output_stream)
+    writer.writerow(HEADER)
+    for glyph, data in glyph_data.items():
+        writer.writerow(
+            (
+                glyph,
+                data.postscript_name or "",
+                " ".join(f"{v:04X}" for v in data.unicodes),
+                data.opentype_category or "",
+                data.export,
             )
+        )
+
+    if output_stream is not sys.stdout:
+        output_stream.close()
 
 
 def extract_data(args: argparse.Namespace) -> None:
@@ -148,7 +156,9 @@ if __name__ == "__main__":
 
     parser_extract = subparsers.add_parser("extract")
     parser_extract.add_argument("ufos", nargs="+", type=Font.open)
-    parser_extract.add_argument("output", type=Path)
+    parser_extract.add_argument(
+        "--output", type=Path, help="File to write data into (default: standard out)"
+    )
     # parser_extract.add_argument("--remove-from-ufo", action="store_true")
     # parser_extract.add_argument("--glyph-list", type=Path)
     parser_extract.set_defaults(func=extract_data)
