@@ -97,7 +97,7 @@ def apply_to_ufos(ufos: list[Font], glyph_data: dict[str, GlyphData]) -> None:
 
 def read_csv(path: Path) -> dict[str, GlyphData]:
     glyph_data: dict[str, GlyphData] = {}
-    with open(path) as csvfile:
+    with open(path, newline="", encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile)
         header = next(reader)
         if tuple(header) != HEADER:
@@ -117,7 +117,7 @@ def read_csv(path: Path) -> dict[str, GlyphData]:
 
 def write_csv(path: Path | None, glyph_data: dict[str, GlyphData]) -> None:
     if path is not None:
-        output_stream = open(path, "w+")
+        output_stream = open(path, "w", newline="", encoding="utf-8")
     else:
         output_stream = sys.stdout
 
