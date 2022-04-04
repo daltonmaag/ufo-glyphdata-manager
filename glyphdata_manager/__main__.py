@@ -157,7 +157,10 @@ if __name__ == "__main__":
     parser_extract = subparsers.add_parser("extract")
     parser_extract.add_argument("ufos", nargs="+", type=Font.open)
     parser_extract.add_argument(
-        "--output", type=Path, help="File to write data into (default: standard out)"
+        "-o",
+        "--output",
+        type=Path,
+        help="File to write data into (default: standard out)",
     )
     # parser_extract.add_argument("--remove-from-ufo", action="store_true")
     # parser_extract.add_argument("--glyph-list", type=Path)
