@@ -123,16 +123,16 @@ def write_csv(path: Path | None, glyph_data: dict[str, GlyphData]) -> None:
 
     writer = csv.writer(output_stream)
     writer.writerow(HEADER)
-    for glyph, data in glyph_data.items():
-        writer.writerow(
-            (
-                glyph,
-                data.postscript_name or "",
-                " ".join(f"{v:04X}" for v in data.unicodes),
-                data.opentype_category or "",
-                data.export,
-            )
+    writer.writerows(
+        (
+            glyph,
+            data.postscript_name or "",
+            " ".join(f"{v:04X}" for v in data.unicodes),
+            data.opentype_category or "",
+            data.export,
         )
+        for glyph, data in glyph_data.items()
+    )
 
     if output_stream is not sys.stdout:
         output_stream.close()
