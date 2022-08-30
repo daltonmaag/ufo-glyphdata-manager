@@ -65,8 +65,8 @@ def extract_from_ufos(ufos: list[Font]) -> dict[str, GlyphData]:
     return glyph_data
 
 
+# TODO: rewrite glyphOrder
 def apply_to_ufos(ufos: list[Font], glyph_data: dict[str, GlyphData]) -> None:
-    # Always overwrite data until we support glyph lists.
     psn: dict[str, str] = {}
     otc: dict[str, str] = {}
     seg: list[str] = []
@@ -77,12 +77,19 @@ def apply_to_ufos(ufos: list[Font], glyph_data: dict[str, GlyphData]) -> None:
             otc[glyph_name] = data.opentype_category
         if not data.export:
             seg.append(glyph_name)
-    seg = sorted(seg)
 
     for ufo in ufos:
-        ufo.lib["public.postscriptNames"] = psn
-        ufo.lib["public.openTypeCategories"] = otc
-        ufo.lib["public.skipExportGlyphs"] = seg
+        ufo_psn: dict[str, str] = ufo.lib.get("public.postscriptNames", {})
+        ufo_otc: dict[str, str] = ufo.lib.get("public.openTypeCategories", {})
+        ufo_seg: set[str] = set(ufo.lib.get("public.skipExportGlyphs", []))
+
+        ufo_psn.update(psn)
+        ufo_otc.update(otc)
+        ufo_seg.update(seg)
+
+        ufo.lib["public.postscriptNames"] = ufo_psn
+        ufo.lib["public.openTypeCategories"] = ufo_otc
+        ufo.lib["public.skipExportGlyphs"] = sorted(ufo_seg)
 
         # Delete empty dicts and lists.
         if not ufo.lib["public.postscriptNames"]:
