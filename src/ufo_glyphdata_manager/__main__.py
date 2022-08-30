@@ -4,11 +4,13 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TextIO
 
 from ufoLib2 import Font
 
@@ -124,7 +126,7 @@ def read_csv(path: Path) -> dict[str, GlyphData]:
 
 def write_csv(path: Path | None, glyph_data: dict[str, GlyphData]) -> None:
     if path is not None:
-        output_stream = open(path, "w", newline="", encoding="utf-8")
+        output_stream: TextIO = open(path, "w", newline="", encoding="utf-8")
     else:
         output_stream = sys.stdout
 
@@ -155,9 +157,7 @@ def apply_data(args: argparse.Namespace) -> None:
     apply_to_ufos(args.ufos, glyph_data)
 
 
-if __name__ == "__main__":
-    import argparse
-
+def main(args: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="subcommand", required=True)
 
@@ -178,5 +178,9 @@ if __name__ == "__main__":
     parser_apply.add_argument("ufos", nargs="+", type=Font.open)
     parser_apply.set_defaults(func=apply_data)
 
-    parsed_args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,24 +1,78 @@
-[tool.poetry]
-name = "glyphdata_manager"
-version = "0.1.0"
-description = ""
-authors = ["Nikolaus Waxweiler <nikolaus.waxweiler@daltonmaag.com>"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.dependencies]
-python = "^3.8"
-ufoLib2 = "^0.13"
+[project]
+name = "ufo-glyphdata-manager"
+description = "Extract and apply global glyph data of UFOs to and from a CSV file."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+    { name = "Nikolaus Waxweiler", email = "nikolaus.waxweiler@daltonmaag.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "ufoLib2>=0.13"
+]
+dynamic = ["version"]
 
-[tool.poetry.dev-dependencies]
-black = "^21.12b0"
-isort = "*"
-mypy = "*"
-pylint = "*"
-pytest = "*"
-pytest-cov = "*"
+# [project.urls]
+# Documentation = "https://github.com/unknown/ufo_glyphdata_manager#readme"
+# Issues = "https://github.com/unknown/ufo_glyphdata_manager/issues"
+# Source = "https://github.com/unknown/ufo_glyphdata_manager"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "black",
+    "isort",
+    "mypy",
+    "pylint",
+    "pytest-cov",
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=ufo_glyphdata_manager --cov=tests"
+no-cov = "cov --no-cov"
+lint = [
+    "black --check --diff src tests",
+    "isort --check-only --diff src tests",
+    "mypy src tests",
+    "pylint src tests",
+]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["38", "39", "310", "311"]
 
 # https://black.readthedocs.io/en/stable/pyproject_toml.html#pyproject-toml
 [tool.black]
 target-version = ["py38"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = []
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
 
 # https://black.readthedocs.io/en/stable/compatible_configs.html#isort
 [tool.isort]
@@ -31,7 +85,3 @@ enable = "F, E, unreachable, duplicate-key, unnecessary-semicolon, global-variab
 
 [tool.pylint.format]
 max-line-length = "88"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
