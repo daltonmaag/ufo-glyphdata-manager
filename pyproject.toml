@@ -28,7 +28,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-cli-name = "ufo_glyphdata_manager.__main__:main"
+ufo-glyphdata-manager = "ufo_glyphdata_manager.__main__:main"
 
 # [project.urls]
 # Documentation = "https://github.com/unknown/ufo_glyphdata_manager#readme"
