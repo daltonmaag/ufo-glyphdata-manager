@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -26,6 +26,9 @@ dependencies = [
     "ufoLib2>=0.13"
 ]
 dynamic = ["version"]
+
+[project.scripts]
+cli-name = "ufo_glyphdata_manager.__main__:main"
 
 # [project.urls]
 # Documentation = "https://github.com/unknown/ufo_glyphdata_manager#readme"

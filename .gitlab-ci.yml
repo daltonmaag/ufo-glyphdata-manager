@@ -16,25 +16,20 @@ stages:
 lint:
   stage: test
   script:
-    - pip3 install -q tox poetry
-    - tox -e lint
-  cache:
-    paths:
-      - "$XDG_CACHE_HOME"
-      - "$CI_PROJECT_DIR/.tox/lint"  # To speed up lint runs.
-    key: "$CI_PROJECT_ID"
+    - pip3 install -q hatch
+    - hatch run lint
 
 test:
   stage: test
   script:
-    - pip3 install -q tox poetry
-    - tox -e py38
+    - pip3 install -q hatch
+    - hatch run cov
 
 build:
   stage: test
   script:
-    - pip3 install -q poetry
-    - poetry build -f wheel
+    - pip3 install -q hatch
+    - hatch build
   artifacts:
     name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}"
     expire_in: "1d"
