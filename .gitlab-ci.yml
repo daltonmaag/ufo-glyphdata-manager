@@ -34,12 +34,12 @@ build:
     name: "${CI_PROJECT_NAME}_${CI_BUILD_REF_NAME}"
     expire_in: "1d"
     paths:
-      - dist/*.whl
+      - dist/*.*
 
 deploy:
   stage: deploy
   script:
-    - scp dist/*.whl pypi@pypi.daltonmaag.com:/var/pypi/repo
+    - scp dist/*.* pypi@pypi.daltonmaag.com:/var/pypi/repo
   only:
     # Only deploy to PyPI on tags that match a PEP 440 compliant version string
     # (with optionally prepended "v"). https://www.python.org/dev/peps/pep-0440/#appendix-b-parsing-version-strings-with-regular-expressions
