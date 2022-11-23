@@ -25,6 +25,7 @@ HEADER: tuple[str, ...] = (
 
 @dataclass
 class GlyphData:
+    __slots__ = "export", "opentype_category", "postscript_name", "unicodes"
     export: bool
     opentype_category: str | None
     postscript_name: str | None
