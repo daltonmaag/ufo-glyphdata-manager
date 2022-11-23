@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-present Dalton Maag Ltd <info@daltonmaag.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # pyright: strict
 
 """Extract and apply global glyph data of UFOs to and from a CSV file."""
