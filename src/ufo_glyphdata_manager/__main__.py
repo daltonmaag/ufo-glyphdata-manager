@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# pyright: strict
-
 """Extract and apply global glyph data of UFOs to and from a CSV file."""
 
 from __future__ import annotations
