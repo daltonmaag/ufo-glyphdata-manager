@@ -84,6 +84,11 @@ def apply_to_ufos(ufos: list[Font], glyph_data: dict[str, GlyphData]) -> None:
             seg.append(glyph_name)
 
     for ufo in ufos:
+        for glyph in ufo:
+            if glyph.name not in glyph_data:
+                continue
+            glyph.unicodes = glyph_data[glyph.name].unicodes
+
         ufo_psn: dict[str, str] = ufo.lib.get("public.postscriptNames", {})
         ufo_otc: dict[str, str] = ufo.lib.get("public.openTypeCategories", {})
         ufo_seg: set[str] = set(ufo.lib.get("public.skipExportGlyphs", []))
